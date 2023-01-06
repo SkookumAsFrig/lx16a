@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/lx16a.dir/tests/test.cpp.o  -o lx16a -Wl,-rpath,/home/k5200/lx16a/build/devel/lib devel/lib/libserial.so -lrt -lpthread 
