@@ -5,7 +5,7 @@ project(lx16a VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(${PROJECT_NAME} tests/test.cpp)
+add_executable(${PROJECT_NAME} src/lx16a.cpp)
 
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
@@ -21,6 +21,8 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
         endif()
     endif()
 endif()
+
+# Update CMakeLists.txt path for more/different submodules
 
 if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ext/serial/CMakeLists.txt")
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
