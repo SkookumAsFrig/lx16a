@@ -5,7 +5,7 @@ project(lx16a VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(${PROJECT_NAME} src/lx16a.cpp)
+add_executable(${PROJECT_NAME} tests/test.cpp)
 
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")

@@ -2,12 +2,6 @@
 #include <vector>
 #include "serial/serial.h"
 
-struct ser_port
-{
-    uint8_t group_id;
-    serial::Serial port;
-};
-
 class lx16a_servo
 {
     private:
