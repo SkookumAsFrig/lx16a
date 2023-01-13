@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include "serial/serial.h"
+#include <unistd.h>
 
 static const uint8_t MOVE_WRITE = 1;
 static const uint8_t POS_READ = 28;
@@ -55,6 +56,57 @@ class lx16a_chain
                 buf[9] = ~chksm;
                 
                 return port_st->port.write(buf, 10);
+            }
+
+            return 0;
+        }
+
+        size_t servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1){
+            if (port_st->port.isOpen())
+            {
+                uint8_t buf[8] = {0x55, 0x55};
+
+                buf[2] = id;
+                buf[3] = 5;
+                buf[4] = cmd;
+
+                buf[5] = 0xFF & part1;
+                buf[6] = 0xFF & (part1 >> 8);
+
+                uint8_t chksm = 0;
+
+                for (int i=2; i<7; i++)
+                {
+                    chksm += buf[i];
+                }
+
+                buf[7] = ~chksm;
+                
+                return port_st->port.write(buf, 8);
+            }
+
+            return 0;
+        }
+
+        size_t servo_write_cmd (uint8_t id, uint8_t cmd){
+            if (port_st->port.isOpen())
+            {
+                uint8_t buf[6] = {0x55, 0x55};
+
+                buf[2] = id;
+                buf[3] = 3;
+                buf[4] = cmd;
+
+                uint8_t chksm = 0;
+
+                for (int i=2; i<5; i++)
+                {
+                    chksm += buf[i];
+                }
+
+                buf[5] = ~chksm;
+                
+                return port_st->port.write(buf, 6);
             }
 
             return 0;
@@ -170,7 +222,27 @@ int main()
 
     size_t sz = 10;
 
+    std::cout<<testtest.servo_write_cmd(1, SERVO_MODE_WRITE, 1, 500)<<std::endl;
+    usleep(1000000);
     std::cout<<testtest.servo_write_cmd(1, SERVO_MODE_WRITE, 1, 0)<<std::endl;
+
+    testtest.port_st->port.flushInput();
+
+    std::cout<<testtest.servo_write_cmd(1, TEMP_READ)<<std::endl;
+
+    // usleep(1000000);
+
+    printf("bytes available: %d \n", testtest.port_st->port.available());
+
+    int buffsize = 50;
+
+    uint8_t rcev_buf [buffsize];
+    std::cout<<testtest.port_st->port.read(rcev_buf, buffsize)<<std::endl;
+
+    for(int i=0; i<buffsize; i++){
+        printf("%X, ", rcev_buf[i]);
+        if (i==buffsize-1) printf("\n");
+    }
 
     return 0;
 }
