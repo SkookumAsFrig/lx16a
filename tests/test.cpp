@@ -1,5 +1,14 @@
 #include <iostream>
+#include <stdio.h>
 #include "serial/serial.h"
+
+static const uint8_t MOVE_WRITE = 1;
+static const uint8_t POS_READ = 28;
+static const uint8_t SERVO_MODE_WRITE = 29;
+static const uint8_t LOAD_UNLOAD_WRITE = 31;
+static const uint8_t SERVO_MOVE_STOP = 12;
+static const uint8_t TEMP_READ = 26;
+static const uint8_t ID_READ = 14;
 
 struct ser_port
 {
@@ -21,16 +30,43 @@ class lx16a_chain
             port_st = port_add;
         }
 
+        size_t servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1, uint16_t part2){
+            if (port_st->port.isOpen())
+            {
+                uint8_t buf[10] = {0x55, 0x55};
+
+                buf[2] = id;
+                buf[3] = 7;
+                buf[4] = cmd;
+
+                buf[5] = 0xFF & part1;
+                buf[6] = 0xFF & (part1 >> 8);
+
+                buf[7] = 0xFF & part2;
+                buf[8] = 0xFF & (part2 >> 8);
+
+                uint8_t chksm = 0;
+
+                for (int i=2; i<9; i++)
+                {
+                    chksm += buf[i];
+                }
+
+                buf[9] = ~chksm;
+                
+                return port_st->port.write(buf, 10);
+            }
+
+            return 0;
+        }
+
         std::string query_port()
         {
             return port_st->port.getPort();
         }
 
-        void query_open(){
-            if(port_st->port.isOpen())
-                std::cout << " Yes." << std::endl;
-            else
-                std::cout << " No." << std::endl;
+        bool query_open(){
+            return port_st->port.isOpen();
         }
 
         unsigned int query_timeout(){
@@ -109,10 +145,32 @@ int main()
     std::cout<<testtest.query_port()<<std::endl;
 
     std::cout<<"Check Open Port"<<std::endl;
-    testtest.query_open();
+    std::cout<<testtest.query_open()<<std::endl;
 
     std::cout<<"Print Timeout"<<std::endl;
     std::cout<<testtest.query_timeout()<<std::endl;
+
+    uint8_t buf[8] = {0x55, 0x55};
+
+    uint16_t part1 = 1000;
+    uint16_t part2 = 5247;
+
+    buf[4] = 0xFF & part1;
+    buf[5] = 0xFF & (part1 >> 8);
+
+    buf[6] = 0xFF & part2;
+    buf[7] = 0xFF & (part2 >> 8);
+
+    for(int i=0; i<8; i++){
+        printf("%X, ", buf[i]);
+        if (i==7) printf("\n");
+    }
+
+    printf("%X", SERVO_MOVE_STOP);
+
+    size_t sz = 10;
+
+    std::cout<<testtest.servo_write_cmd(1, SERVO_MODE_WRITE, 1, 0)<<std::endl;
 
     return 0;
 }

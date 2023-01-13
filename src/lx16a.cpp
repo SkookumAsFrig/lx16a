@@ -1,27 +1,6 @@
 #include <iostream>
-#include <vector>
 #include "serial/serial.h"
-
-class lx16a_servo
-{
-    private:
-        uint8_t servo_id;
-        ser_port port_struct;
-        uint8_t alias;
-        uint32_t ser_delay;
-
-        bool check_id(uint8_t id);
-        size_t servo_write_cmd(uint8_t id, uint8_t cmd, uint8_t part1 = NULL, uint8_t part2 = NULL);
-        
-    public:
-        lx16a_servo (uint8_t id, ser_port p_str, uint8_t nickname = NULL, uint32_t delay = 0);
-        lx16a_servo (const lx16a_servo &servo);
-        uint8_t check_temp();
-        void unload();
-        void cmd_servo_pos();
-        void motor_power();
-        uint16_t check_position();
-};
+#include "lx16a.hpp"
 
 void enumerate_ports()
 {
@@ -37,23 +16,46 @@ void enumerate_ports()
     }
 }
 
-int main()
-{
-    std::cout<<"Hello World"<<std::endl;
-    enumerate_ports();
-
-    std::vector<int> n{6, 7, 8, 9, 10};
-
-    lx16a_chain first_chain(n);
-    std::vector<int> haha = first_chain.get_temps();
-
-    for (int x : haha)
+size_t lx16a::servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1, uint16_t part2){
+    if (port_st->port.isOpen())
     {
-        std::cout<<x<<std::endl;
+        uint8_t buf[10] = {0x55, 0x55};
+
+        buf[2] = id;
+        buf[3] = 7;
+        buf[4] = cmd;
+
+        buf[5] = 0xFF & part1;
+        buf[6] = 0xFF & (part1 >> 8);
+
+        buf[7] = 0xFF & part2;
+        buf[8] = 0xFF & (part2 >> 8);
+
+        uint8_t chksm = 0;
+
+        for (int i=2; i<9; i++)
+        {
+            chksm += buf[i];
+        }
+        chksm = ~chksm;
+
+        buf[9] = chksm;
+        
+        return port_st->port.write(buf, 10);
     }
 
-    std::cout<<&haha<<std::endl;
-    std::cout<<&n<<std::endl;
-
     return 0;
+}
+
+bool lx16a::check_id(unsigned int id){
+    return 1;
+}
+
+lx16a::lx16a(ser_port* struct_ptr, unsigned int id = 256, unsigned int nickname = 256, unsigned int delay = 0)
+{
+    alias = nickname;
+    port_ptr = struct_ptr;
+
+    servo_id = id;
+
 }
