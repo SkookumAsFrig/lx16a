@@ -176,7 +176,7 @@ int main()
     port_struct.group_id = 1;
     port_struct.port.setPort("/dev/ttyUSB0");
     port_struct.port.setBaudrate(115200);
-    serial::Timeout chain_time= serial::Timeout::simpleTimeout(1000);
+    serial::Timeout chain_time= serial::Timeout::simpleTimeout(10);
     std::cout<<chain_time.inter_byte_timeout<<std::endl;
     port_struct.port.setTimeout(chain_time);
     port_struct.port.open();
@@ -227,26 +227,30 @@ int main()
     usleep(1000000);
     std::cout<<testtest.servo_write_cmd(1, SERVO_MODE_WRITE, 1, 0)<<std::endl;
 
-    int buffsize = 7;
+    int buffsize = 8;
+    uint8_t rcev_buf [buffsize];
+
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-    for(int i=0; i<buffsize; i++){
+    // for(int i=0; i<500; i++){
 
-    testtest.port_st->port.flushInput();
+        testtest.port_st->port.flushInput();
 
-    testtest.servo_write_cmd(1, TEMP_READ);
+        // testtest.servo_write_cmd(1, TEMP_READ);
+        testtest.servo_write_cmd(1, POS_READ);
 
-    uint8_t rcev_buf [buffsize];
-    testtest.port_st->port.read(rcev_buf, buffsize);
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-        // printf("%dC\n", rcev_buf[5]);
-    }
+        testtest.port_st->port.read(rcev_buf, buffsize);
 
-    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        printf("%d Position\n", rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8)));
+    // }
 
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
+    std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
+
+    std::cout << "Send Time = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+    std::cout << "Recv Time = " << std::chrono::duration_cast<std::chrono::microseconds>(end2 - end).count() << "[µs]" << std::endl;
 
     return 0;
 }

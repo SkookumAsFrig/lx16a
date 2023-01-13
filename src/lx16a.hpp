@@ -1,6 +1,14 @@
 #include <iostream>
 #include "serial/serial.h"
 
+static const uint8_t MOVE_WRITE = 1;
+static const uint8_t POS_READ = 28;
+static const uint8_t SERVO_MODE_WRITE = 29;
+static const uint8_t LOAD_UNLOAD_WRITE = 31;
+static const uint8_t SERVO_MOVE_STOP = 12;
+static const uint8_t TEMP_READ = 26;
+static const uint8_t ID_READ = 14;
+
 struct ser_port
 {
     unsigned int group_id;

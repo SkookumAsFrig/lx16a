@@ -37,9 +37,8 @@ size_t lx16a::servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1, uint16_t
         {
             chksm += buf[i];
         }
-        chksm = ~chksm;
 
-        buf[9] = chksm;
+        buf[9] = ~chksm;
         
         return port_st->port.write(buf, 10);
     }
