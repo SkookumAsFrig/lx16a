@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "serial/serial.h"
 #include <unistd.h>
+#include <chrono>
 
 static const uint8_t MOVE_WRITE = 1;
 static const uint8_t POS_READ = 28;
@@ -226,23 +227,26 @@ int main()
     usleep(1000000);
     std::cout<<testtest.servo_write_cmd(1, SERVO_MODE_WRITE, 1, 0)<<std::endl;
 
-    testtest.port_st->port.flushInput();
+    int buffsize = 7;
 
-    std::cout<<testtest.servo_write_cmd(1, TEMP_READ)<<std::endl;
-
-    // usleep(1000000);
-
-    printf("bytes available: %d \n", testtest.port_st->port.available());
-
-    int buffsize = 50;
-
-    uint8_t rcev_buf [buffsize];
-    std::cout<<testtest.port_st->port.read(rcev_buf, buffsize)<<std::endl;
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     for(int i=0; i<buffsize; i++){
-        printf("%X, ", rcev_buf[i]);
-        if (i==buffsize-1) printf("\n");
+
+    testtest.port_st->port.flushInput();
+
+    testtest.servo_write_cmd(1, TEMP_READ);
+
+    uint8_t rcev_buf [buffsize];
+    testtest.port_st->port.read(rcev_buf, buffsize);
+
+        // printf("%dC\n", rcev_buf[5]);
     }
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
 
     return 0;
 }
