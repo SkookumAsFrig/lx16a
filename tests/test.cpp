@@ -12,13 +12,15 @@ int main()
     enumerate_ports();
     std::cout<<"List Port Finished"<<std::endl;
 
-    ser_port port_struct;
-    port_struct.group_id = 1;
-    port_struct.port.setPort("/dev/ttyUSB0");
-    port_struct.port.setBaudrate(115200);
-    serial::Timeout chain_time= serial::Timeout::simpleTimeout(20);
-    port_struct.port.setTimeout(chain_time);
-    port_struct.port.open();
+    ser_port port_struct("/dev/ttyUSB0", 115200, 20, 1);
+
+    // Alternative way to initialize serial port struct:
+    // port_struct.group_id = 1;
+    // port_struct.port.setPort("/dev/ttyUSB0");
+    // port_struct.port.setBaudrate(115200);
+    // serial::Timeout chain_time= serial::Timeout::simpleTimeout(20);
+    // port_struct.port.setTimeout(chain_time);
+    // port_struct.port.open();
 
     lx16a servo(&port_struct, 1, 1);
 
@@ -33,7 +35,7 @@ int main()
         time = std::chrono::duration_cast<std::chrono::seconds>(end - begin).count();
         servo.motor_power(400);
         std::cout<<servo.check_pos()<<std::endl;
-        std::cout<<time<<std::endl;
+        // std::cout<<time<<std::endl;
     }
 
     servo.unload();

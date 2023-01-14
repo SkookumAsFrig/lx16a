@@ -19,6 +19,18 @@ void enumerate_ports ()
     }
 }
 
+ser_port::ser_port (const std::string &portname, unsigned int baud, unsigned int timeout, unsigned int g_id)
+{
+    group_id = g_id;
+
+    serial::Timeout chain_time= serial::Timeout::simpleTimeout(timeout);
+    port.setPort(portname);
+    port.setBaudrate(baud);
+    port.setTimeout(chain_time);
+
+    port.open();
+}
+
 lx16a::lx16a (ser_port* struct_ptr, unsigned int id, unsigned int nickname)
 {
     alias = nickname;
@@ -35,7 +47,7 @@ lx16a::lx16a (const lx16a& servo, unsigned int id, unsigned int nickname)
     // copy constructor + mutator for quickly creating servos in chain
     port_ptr = servo.port_ptr;
     alias = (nickname == 256) ? servo.alias : nickname;
-    servo_id = (id == 256) ? servo.servo_id : id;
+    servo_id = (id != 256 && check_id(id)) ? id : servo.servo_id;
 }
 
 size_t lx16a::servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1, uint16_t part2)
