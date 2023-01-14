@@ -28,11 +28,12 @@ if(NOT EXISTS "${PROJECT_SOURCE_DIR}/ext/serial/CMakeLists.txt")
     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 endif()
 
-add_subdirectory(ext/serial)
+list(APPEND EXTRA_INCLUDES ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/ext/serial/include ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include)
+list(APPEND EXTRA_LIBS serial lx16a_lib)
 
-target_include_directories(${PROJECT_NAME}
-    PUBLIC ${PROJECT_BINARY_DIR}
-    PUBLIC ext/serial/include
-)
+add_subdirectory(${PROJECT_SOURCE_DIR}/ext/serial)
+add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 
-target_link_libraries(${PROJECT_NAME} serial)
+target_include_directories(${PROJECT_NAME} PUBLIC ${EXTRA_INCLUDES})
+
+target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})

@@ -19,7 +19,7 @@ void enumerate_ports ()
     }
 }
 
-lx16a::lx16a (ser_port* struct_ptr, unsigned int id = 256, unsigned int nickname = 256)
+lx16a::lx16a (ser_port* struct_ptr, unsigned int id, unsigned int nickname)
 {
     alias = nickname;
     port_ptr = struct_ptr;
@@ -30,7 +30,7 @@ lx16a::lx16a (ser_port* struct_ptr, unsigned int id = 256, unsigned int nickname
     // else throw warning exception id does not exist in hardware
 }
 
-lx16a::lx16a (const lx16a_servo &servo, unsigned int id = 256, unsigned int nickname = 256)
+lx16a::lx16a (const lx16a& servo, unsigned int id, unsigned int nickname)
 {
     // copy constructor + mutator for quickly creating servos in chain
     port_ptr = servo.port_ptr;
@@ -122,54 +122,55 @@ size_t lx16a::servo_write_cmd (uint8_t id, uint8_t cmd)
     return 0;
 }
 
-std::string query_port ()
+std::string lx16a::query_port ()
 {
     return port_ptr->port.getPort();
 }
 
-bool query_open ()
+bool lx16a::query_open ()
 {
     return port_ptr->port.isOpen();
 }
 
-unsigned int query_timeout ()
+unsigned int lx16a::query_timeout ()
 {
     return port_ptr->port.getTimeout().inter_byte_timeout;
 }
 
-bool lx16a::check_id (unsigned int id)
+bool lx16a::check_id (unsigned int new_id)
 {
-
-    int buffsize = 7;
-    uint8_t rcev_buf [buffsize];
-
-    port_ptr->port.flushInput();
-    servo_write_cmd(id, ID_READ);
-
-    size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
-
-    if (b_read == 7 && rcev_buf[0] == 0x55 &&
-        rcev_buf[0] == 0x55 && && rcev_buf[4] == 0x0E)
+    if (new_id < 254)
     {
-        return true;
+        int buffsize = 7;
+        uint8_t rcev_buf [buffsize];
+
+        port_ptr->port.flushInput();
+        servo_write_cmd(new_id, ID_READ);
+
+        size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
+
+        if (b_read == 7 && rcev_buf[0] == 0x55 &&
+            rcev_buf[0] == 0x55 && rcev_buf[4] == 0x0E)
+        {
+            return true;
+        }
     }
 
     return false;
 }
 
-unsigned int lx16a::check_temp (unsigned int id)
+unsigned int lx16a::check_temp ()
 {
-
     int buffsize = 7;
     uint8_t rcev_buf [buffsize];
 
     port_ptr->port.flushInput();
-    servo_write_cmd(id, TEMP_READ);
+    servo_write_cmd(servo_id, TEMP_READ);
 
     size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
 
     if (b_read == 7 && rcev_buf[0] == 0x55 &&
-        rcev_buf[0] == 0x55 && && rcev_buf[4] == 0x1A)
+        rcev_buf[0] == 0x55 && rcev_buf[4] == 0x1A)
     {
         return rcev_buf[5];
     }
@@ -180,47 +181,51 @@ unsigned int lx16a::check_temp (unsigned int id)
 
 }
 
-void lx16a::unload (unsigned int id)
+void lx16a::unload ()
 {
 
     port_ptr->port.flushInput();
-    servo_write_cmd(id, LOAD_UNLOAD_WRITE, 0);
+    servo_write_cmd(servo_id, SERVO_MODE_WRITE, 0);
+    servo_write_cmd(servo_id, LOAD_UNLOAD_WRITE, 0);
     
 }
 
-void lx16a::cmd_servo_pos (unsigned int id, unsigned int pos)
+void lx16a::cmd_servo_pos (unsigned int pos)
 {
 
     port_ptr->port.flushInput();
-    servo_write_cmd(id, SERVO_MODE_WRITE, 0);
+    servo_write_cmd(servo_id, SERVO_MODE_WRITE, 0);
 
-    pos = std::min(pos, 1000);
-    servo_write_cmd(id, MOVE_WRITE, pos);
+    unsigned int pos_max = 1000;
+    pos = std::min(pos, pos_max);
+
+    servo_write_cmd(servo_id, MOVE_WRITE, pos);
 
 }
 
-void lx16a::motor_power (unsigned int id, int pwr)
+void lx16a::motor_power (int pwr)
 {
 
     port_ptr->port.flushInput();
     pwr = std::max(std::min(pwr, 1000), -1000);
-    servo_write_cmd(id, SERVO_MODE_WRITE, 1, pwr);
+
+    servo_write_cmd(servo_id, SERVO_MODE_WRITE, 1, pwr);
     
 }
 
-unsigned int lx16a::check_pos (unsigned int id)
+unsigned int lx16a::check_pos ()
 {
 
     int buffsize = 8;
     uint8_t rcev_buf [buffsize];
 
     port_ptr->port.flushInput();
-    servo_write_cmd(id, POS_READ);
+    servo_write_cmd(servo_id, POS_READ);
 
     size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
 
     if (b_read == 8 && rcev_buf[0] == 0x55 &&
-        rcev_buf[0] == 0x55 && && rcev_buf[4] == 0x1C)
+        rcev_buf[0] == 0x55 && rcev_buf[4] == 0x1C)
     {
         return rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8));
     }

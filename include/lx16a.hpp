@@ -17,7 +17,7 @@ struct ser_port
     unsigned int group_id;
     serial::Serial port;
 };
-
+// need to write comments explaning how and why to use each function
 class lx16a
 {
     private:
@@ -31,15 +31,18 @@ class lx16a
         bool check_id (unsigned int id);
         
     public:
-        lx16a (ser_port* struct_ptr, unsigned int id, unsigned int nickname = 0);
-        lx16a (const lx16a_servo &servo, unsigned int id = 256, unsigned int nickname = 256);
+        // constructors
+        lx16a (ser_port* struct_ptr, unsigned int id = 256, unsigned int nickname = 256);
+        lx16a (const lx16a& servo, unsigned int id = 256, unsigned int nickname = 256);
+        // serial port tools
         std::string query_port ();
         bool query_open ();
         unsigned int query_timeout ();
-        unsigned int check_temp (unsigned int id);
-        void unload (unsigned int id);
-        void cmd_servo_pos (unsigned int id, unsigned int pos);
-        void motor_power (unsigned int id, int pwr);
-        unsigned int check_pos (unsigned int id);
+        // utility functions
+        unsigned int check_temp ();
+        void unload ();
+        void cmd_servo_pos (unsigned int pos);
+        void motor_power (int pwr);
+        unsigned int check_pos ();
 };
 
