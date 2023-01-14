@@ -227,7 +227,7 @@ int main()
     usleep(1000000);
     std::cout<<testtest.servo_write_cmd(1, SERVO_MODE_WRITE, 1, 0)<<std::endl;
 
-    int buffsize = 8;
+    int buffsize = 7;
     uint8_t rcev_buf [buffsize];
 
 
@@ -238,14 +238,19 @@ int main()
         testtest.port_st->port.flushInput();
 
         // testtest.servo_write_cmd(1, TEMP_READ);
-        testtest.servo_write_cmd(1, POS_READ);
+        // testtest.servo_write_cmd(1, POS_READ);
+        testtest.servo_write_cmd(1, ID_READ);
 
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-        testtest.port_st->port.read(rcev_buf, buffsize);
+        std::cout <<testtest.port_st->port.read(rcev_buf, buffsize)<< std::endl;
 
-        printf("%d Position\n", rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8)));
-    // }
+        // printf("%d Position\n", rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8)));
+        for(int i=0; i<8; i++){
+            printf("%X, ", rcev_buf[i]);
+            if (i==7) printf("\n");
+        }
+        // }
 
     std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
 
