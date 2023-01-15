@@ -122,12 +122,12 @@ class lx16a
 
         // query position of servo
         /*
-        \return: int representing position of current servo, between 0-1000. May return as high as
-        65535 if out of range (below 0), or above 1000 in other direction.
+        \return: short representing position of current servo, between 0-1000. May return negative,
+            or above 1000 in the other direction. Out of range behaviors necessitate the 16 bit
+            short data type to decode the sign correctly.
         */
-        unsigned int check_pos ();
+        short check_pos ();
 
-        // make check_pos wrap around 0 correctly
         // write changer servo id and alias functions
         // add exceptions to class for warnings and errors
 };

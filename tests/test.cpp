@@ -29,7 +29,7 @@ int main()
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     int time = 0;
 
-    while (time < 3)
+    while (time < 4)
     {
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
         time = std::chrono::duration_cast<std::chrono::seconds>(end - begin).count();

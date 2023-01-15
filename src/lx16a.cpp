@@ -225,7 +225,7 @@ void lx16a::motor_power (int pwr)
     
 }
 
-unsigned int lx16a::check_pos ()
+short lx16a::check_pos ()
 {
 
     int buffsize = 8;
@@ -244,5 +244,5 @@ unsigned int lx16a::check_pos ()
 
     // throw position read failed warning
     
-    return 70000;
+    return 3000;
 }
