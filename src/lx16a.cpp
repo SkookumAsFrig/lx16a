@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <unistd.h>
 #include "serial/serial.h"
 #include "lx16a.hpp"
 
@@ -38,6 +39,10 @@ lx16a::lx16a (ser_port* struct_ptr, unsigned int id, unsigned int nickname)
 
     if (check_id(id)){
         servo_id = id;
+    }
+    else{
+        std::cout<<"servo_id does not exist"<<std::endl;
+        servo_id = 256;
     }
     // else throw warning exception id does not exist in hardware
 }
@@ -132,6 +137,46 @@ size_t lx16a::servo_write_cmd (uint8_t id, uint8_t cmd)
     }
 
     return 0;
+}
+
+unsigned int lx16a::get_id()
+{
+    return servo_id;
+}
+
+unsigned int lx16a::get_alias()
+{
+    return alias;
+}
+
+ser_port* lx16a::get_ser_struct()
+{
+    return port_ptr;
+}
+
+bool lx16a::set_obj_id(unsigned int id)
+{
+    if (check_id(id))
+    {
+        servo_id = id;
+        return true;
+    }
+
+    return false;
+}
+
+void lx16a::set_alias(unsigned int nickname)
+{
+    alias = nickname;
+}
+
+bool lx16a::set_ser_struct(ser_port* new_struct_ptr)
+{
+    port_ptr = new_struct_ptr;
+
+    if (query_open() && check_id(servo_id)) return true;
+
+    return false;
 }
 
 std::string lx16a::query_port ()
@@ -245,4 +290,24 @@ short lx16a::check_pos ()
     // throw position read failed warning
     
     return 3000;
+}
+
+bool lx16a::set_hw_id (unsigned int new_id)
+{
+    if (new_id < 254)
+    {
+        port_ptr->port.flushInput();
+        servo_write_cmd(servo_id, ID_WRITE, new_id);
+        
+        // command to delay until servo finishes id update, usleep also works, result not used
+        check_id(new_id);
+
+        if (check_id(new_id))
+        {
+            servo_id = new_id;
+            return true;
+        }
+    }
+
+    return false;
 }
