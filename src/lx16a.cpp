@@ -25,6 +25,13 @@ ser_port::ser_port (const std::string &portname, unsigned int baud, unsigned int
 {
     group_id = g_id;
 
+    if (timeout<30)
+    {
+        std::cout<<"Serial timeout recommended to be greater than 30ms for servo to respond to longer messages"<<std::endl;
+        std::cout<<"Current timeout: "<<timeout<<"ms, may encounter command errors"<<std::endl;
+        // Replace with warning down the line
+    }
+
     serial::Timeout chain_time= serial::Timeout::simpleTimeout(timeout);
     port.setPort(portname);
     port.setBaudrate(baud);

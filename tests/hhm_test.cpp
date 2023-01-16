@@ -12,7 +12,7 @@ int main()
     enumerate_ports();
     std::cout<<"List Port Finished"<<std::endl;
 
-    ser_port port_struct("/dev/ttyUSB0", 115200, 20, 1);
+    ser_port port_struct("/dev/ttyUSB0", 115200, 50, 1);
 
     // Alternative way to initialize serial port struct:
     // port_struct.group_id = 1;
@@ -28,8 +28,8 @@ int main()
     std::cout<<servo1.check_temp()<<std::endl;
     std::cout<<servo3.check_temp()<<std::endl;
 
-    servo1.set_vin_limit(6500, 11000);
-    servo3.set_vin_limit(5000, 11500);
+    servo1.set_vin_limit(6503, 11060);
+    servo3.set_vin_limit(5920, 11590);
 
     unsigned int low_lim1, high_lim1, low_lim3, high_lim3;
 
@@ -39,8 +39,8 @@ int main()
     printf("servo 1 low limit is %d, high limit is %d\n", low_lim1, high_lim1);
     printf("servo 3 low limit is %d, high limit is %d\n", low_lim3, high_lim3);
 
-    servo1.set_temp_limit(85);
-    servo3.set_temp_limit(71);
+    servo1.set_temp_limit(82);
+    servo3.set_temp_limit(75);
 
     std::cout<<servo1.read_temp_limit()<<std::endl;
     std::cout<<servo3.read_temp_limit()<<std::endl;
