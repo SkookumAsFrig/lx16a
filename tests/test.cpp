@@ -41,15 +41,31 @@ int main()
         // std::cout<<time<<std::endl;
     }
 
-    // std::cout<<servo.set_hw_id(3)<<std::endl;
+    // std::cout<<servo1.set_hw_id(3)<<std::endl;
 
-    // std::cout<<servo.check_id(3)<<std::endl;
+    // std::cout<<servo1.check_id(3)<<std::endl;
 
-    // std::cout<<"servo_id is "<<servo.get_id()<<std::endl;
+    // std::cout<<"servo_id is "<<servo1.get_id()<<std::endl;
 
-    std::cout<<"struct change status is "<<servo3.set_ser_struct(&port_struct)<<std::endl;
+    // std::cout<<"struct change status is "<<servo3.set_ser_struct(&port_struct)<<std::endl;
 
     servo1.cmd_servo_pos(500);
+
+    servo3.cmd_servo_pos(0);
+
+    usleep(1000000);
+
+    servo3.cmd_servo_pos(300);
+
+    usleep(1000000);
+
+    servo3.cmd_servo_pos(600);
+
+    usleep(1000000);
+
+    servo3.cmd_servo_pos(1000);
+
+    usleep(1000000);
 
     servo3.cmd_servo_pos(0);
 

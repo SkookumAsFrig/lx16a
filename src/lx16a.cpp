@@ -256,7 +256,7 @@ void lx16a::cmd_servo_pos (unsigned int pos)
     unsigned int pos_max = 1000;
     pos = std::min(pos, pos_max);
 
-    servo_write_cmd(servo_id, MOVE_WRITE, pos);
+    servo_write_cmd(servo_id, MOVE_WRITE, pos, 0);
 
 }
 

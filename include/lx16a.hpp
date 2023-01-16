@@ -177,6 +177,7 @@ class lx16a
         */
         bool set_hw_id (unsigned int new_id);
 
+        // add voltage and temp warning set functions, and disable over position
         // add exceptions to class for warnings and errors
 };
 
