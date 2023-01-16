@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <unistd.h>
+#include <tuple>
 #include "serial/serial.h"
 #include "lx16a.hpp"
 
@@ -194,6 +195,70 @@ unsigned int lx16a::query_timeout ()
     return port_ptr->port.getTimeout().inter_byte_timeout;
 }
 
+void lx16a::set_vin_limit(unsigned int low_lim, unsigned int high_lim)
+{
+    low_lim = std::max(std::min((int) low_lim, 11999), 4500);
+    high_lim = std::max(std::min((int) high_lim, 12000), 4501);
+
+    if (low_lim>= high_lim) low_lim = high_lim-1;
+
+    port_ptr->port.flushInput();
+    servo_write_cmd(servo_id, VIN_LIMIT_WRITE, low_lim, high_lim);
+}
+
+std::tuple<unsigned int, unsigned int> lx16a::read_vin_limit()
+{
+    int buffsize = 10;
+    uint8_t rcev_buf [buffsize];
+
+    port_ptr->port.flushInput();
+    servo_write_cmd(servo_id, VIN_LIMIT_READ);
+
+    size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
+
+    unsigned int low_lim = 0, high_lim = 0;
+
+    if (b_read == 10 && rcev_buf[0] == 0x55 &&
+        rcev_buf[1] == 0x55 && rcev_buf[4] == 0x17)
+    {
+        low_lim = rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8));
+        high_lim = rcev_buf[7] | (0xFF00 & (rcev_buf[8] << 8));
+    }
+
+    // throw vin limit read failed warning
+    
+    return std::make_tuple(low_lim, high_lim);
+}
+
+void lx16a::set_temp_limit(unsigned int max_temp)
+{
+    max_temp = std::max(std::min((int) max_temp, 100), 50);
+
+    port_ptr->port.flushInput();
+    servo_write_cmd(servo_id, TEMP_MAX_LIMIT_WRITE, max_temp);
+}
+
+unsigned int lx16a::read_temp_limit()
+{
+    int buffsize = 7;
+    uint8_t rcev_buf [buffsize];
+
+    port_ptr->port.flushInput();
+    servo_write_cmd(servo_id, TEMP_MAX_LIMIT_READ);
+
+    size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
+
+    if (b_read == 7 && rcev_buf[0] == 0x55 &&
+        rcev_buf[1] == 0x55 && rcev_buf[4] == 0x19)
+    {
+        return rcev_buf[5];
+    }
+
+    // throw temp read failed warning
+
+    return 256;
+}
+
 bool lx16a::check_id (unsigned int new_id)
 {
     if (new_id < 254)
@@ -207,7 +272,7 @@ bool lx16a::check_id (unsigned int new_id)
         size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
 
         if (b_read == 7 && rcev_buf[0] == 0x55 &&
-            rcev_buf[0] == 0x55 && rcev_buf[4] == 0x0E)
+            rcev_buf[1] == 0x55 && rcev_buf[4] == 0x0E)
         {
             return true;
         }
@@ -227,7 +292,7 @@ unsigned int lx16a::check_temp ()
     size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
 
     if (b_read == 7 && rcev_buf[0] == 0x55 &&
-        rcev_buf[0] == 0x55 && rcev_buf[4] == 0x1A)
+        rcev_buf[1] == 0x55 && rcev_buf[4] == 0x1A)
     {
         return rcev_buf[5];
     }
@@ -257,6 +322,8 @@ void lx16a::cmd_servo_pos (unsigned int pos)
     pos = std::min(pos, pos_max);
 
     servo_write_cmd(servo_id, MOVE_WRITE, pos, 0);
+    // Need to set last param move time to 0 to tell servo
+    // to move to pos at max velocity
 
 }
 
@@ -282,7 +349,7 @@ short lx16a::check_pos ()
     size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
 
     if (b_read == 8 && rcev_buf[0] == 0x55 &&
-        rcev_buf[0] == 0x55 && rcev_buf[4] == 0x1C)
+        rcev_buf[1] == 0x55 && rcev_buf[4] == 0x1C)
     {
         return rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8));
     }

@@ -3,20 +3,7 @@
 #include "serial/serial.h"
 #include <unistd.h>
 #include <chrono>
-
-static const uint8_t MOVE_WRITE = 1;
-static const uint8_t POS_READ = 28;
-static const uint8_t SERVO_MODE_WRITE = 29;
-static const uint8_t LOAD_UNLOAD_WRITE = 31;
-static const uint8_t SERVO_MOVE_STOP = 12;
-static const uint8_t TEMP_READ = 26;
-static const uint8_t ID_READ = 14;
-
-struct ser_port
-{
-    unsigned int group_id;
-    serial::Serial port;
-};
+#include "lx16a.hpp"
 
 class lx16a_chain
 {
@@ -227,7 +214,7 @@ int main()
     usleep(1000000);
     std::cout<<testtest.servo_write_cmd(1, SERVO_MODE_WRITE, 1, 0)<<std::endl;
 
-    int buffsize = 7;
+    int buffsize = 10;
     uint8_t rcev_buf [buffsize];
 
 
@@ -239,16 +226,16 @@ int main()
 
         // testtest.servo_write_cmd(1, TEMP_READ);
         // testtest.servo_write_cmd(1, POS_READ);
-        testtest.servo_write_cmd(1, ID_READ);
+        testtest.servo_write_cmd(1, VIN_LIMIT_READ);
 
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
         std::cout <<testtest.port_st->port.read(rcev_buf, buffsize)<< std::endl;
 
         // printf("%d Position\n", rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8)));
-        for(int i=0; i<8; i++){
+        for(int i=0; i<buffsize; i++){
             printf("%X, ", rcev_buf[i]);
-            if (i==7) printf("\n");
+            if (i==buffsize-1) printf("\n");
         }
         // }
 

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <tuple>
 #include "serial/serial.h"
 
 // See docs/lx16a_protocol.pdf for servo command reference
@@ -11,6 +12,10 @@ static const uint8_t SERVO_MOVE_STOP = 12;
 static const uint8_t TEMP_READ = 26;
 static const uint8_t ID_READ = 14;
 static const uint8_t ID_WRITE = 13;
+static const uint8_t VIN_LIMIT_WRITE = 22;
+static const uint8_t VIN_LIMIT_READ = 23;
+static const uint8_t TEMP_MAX_LIMIT_WRITE = 24;
+static const uint8_t TEMP_MAX_LIMIT_READ = 25;
 // End of servo command constants
 
 // Helper function from serial library example to list available serial ports
@@ -80,6 +85,8 @@ class lx16a
         */
         lx16a (const lx16a& servo, unsigned int id = 256, unsigned int nickname = 256);
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
         // Getter functions
         // get servo_id of current lx16a object
         /*!
@@ -98,6 +105,8 @@ class lx16a
         \return: ser_port pointer representing associated ser_port struct of object
         */
         ser_port* get_ser_struct();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
 
         // Setter functions
         // set servo_id of current lx16a object. Note this is not setting servo hardware id, just modifying
@@ -121,6 +130,8 @@ class lx16a
         */
         bool set_ser_struct(ser_port* new_struct_ptr);
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
         // Serial Port Tools
         // helper function, returns servo serial port as string
         std::string query_port ();
@@ -130,6 +141,19 @@ class lx16a
 
         // helper function, returns unsigned int of serial timeout object value field
         unsigned int query_timeout ();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+
+        // Hardware Safety Tools
+        void set_vin_limit(unsigned int low_lim, unsigned int high_lim);
+
+        std::tuple<unsigned int, unsigned int> read_vin_limit();
+
+        void set_temp_limit(unsigned int max_temp);
+
+        unsigned int read_temp_limit();
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
 
         // Utility Functions
         // query temperature of servo
