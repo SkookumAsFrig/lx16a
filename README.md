@@ -9,3 +9,19 @@ linux command line shortcuts (shell scripts must be executable (chmod +x configu
 ./configure.sh
 ./_build.sh
 ./run.sh
+
+Install prereqs on new Ubuntu machine: 
+
+$ sudo sh \
+    -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" \
+        > /etc/apt/sources.list.d/ros-latest.list'
+$ wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
+
+$ sudo apt-get update
+$ sudo apt-get install python3-catkin-tools
+
+$ sudo apt-get install cmake python-catkin-pkg python-empy python-nose libgtest-dev
+$ sudo apt-get install ros-melodic-catkin
+
+$ source /opt/ros/melodic/setup.bash
+Add sourcing catkin to bashrc for automatic upon new terminal session, change melodic to ros version of choice
