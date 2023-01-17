@@ -226,7 +226,7 @@ int main()
 
         // testtest.servo_write_cmd(1, TEMP_READ);
         // testtest.servo_write_cmd(1, POS_READ);
-        testtest.servo_write_cmd(1, VIN_LIMIT_READ);
+        testtest.servo_write_cmd(3, ERROR_READ);
 
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
@@ -243,6 +243,10 @@ int main()
 
     std::cout << "Send Time = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
     std::cout << "Recv Time = " << std::chrono::duration_cast<std::chrono::microseconds>(end2 - end).count() << "[µs]" << std::endl;
+
+    for(int i=0; i<9; i++){
+        std::cout <<led_err.at(i)<< std::endl;
+    }
 
     return 0;
 }

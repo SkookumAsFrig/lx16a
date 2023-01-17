@@ -40,13 +40,19 @@ ser_port::ser_port (const std::string &portname, unsigned int baud, unsigned int
     port.open();
 }
 
-lx16a::lx16a (ser_port* struct_ptr, unsigned int id, unsigned int nickname)
+lx16a::lx16a (ser_port* struct_ptr, unsigned int id, unsigned int nickname, bool new_safe_lim)
 {
     alias = nickname;
     port_ptr = struct_ptr;
 
-    if (check_id(id)){
+    if (id <254 && check_id(id))
+    {
         servo_id = id;
+        if (new_safe_lim)
+        {
+            set_vin_limit(5000,9500);
+            set_temp_limit(80);
+        }
     }
     else{
         std::cout<<"servo_id does not exist"<<std::endl;
@@ -55,12 +61,24 @@ lx16a::lx16a (ser_port* struct_ptr, unsigned int id, unsigned int nickname)
     // else throw warning exception id does not exist in hardware
 }
 
-lx16a::lx16a (const lx16a& servo, unsigned int id, unsigned int nickname)
+lx16a::lx16a (const lx16a& servo, unsigned int id, unsigned int nickname, bool new_safe_lim)
 {
     // copy constructor + mutator for quickly creating servos in chain
     port_ptr = servo.port_ptr;
     alias = (nickname == 256) ? servo.alias : nickname;
-    servo_id = (id != 256 && check_id(id)) ? id : servo.servo_id;
+    if (id <254 && check_id(id))
+    {
+        servo_id = id;
+        if (new_safe_lim)
+        {
+            set_vin_limit(5000,9500);
+            set_temp_limit(80);
+        }
+    }
+    else{
+        servo_id = servo.servo_id;
+    }
+
 }
 
 size_t lx16a::servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1, uint16_t part2)
@@ -211,6 +229,7 @@ void lx16a::set_vin_limit(unsigned int low_lim, unsigned int high_lim)
 
     port_ptr->port.flushInput();
     servo_write_cmd(servo_id, VIN_LIMIT_WRITE, low_lim, high_lim);
+    usleep(30000);
 }
 
 std::tuple<unsigned int, unsigned int> lx16a::read_vin_limit()
@@ -243,6 +262,7 @@ void lx16a::set_temp_limit(unsigned int max_temp)
 
     port_ptr->port.flushInput();
     servo_write_cmd(servo_id, TEMP_MAX_LIMIT_WRITE, max_temp);
+    usleep(30000);
 }
 
 unsigned int lx16a::read_temp_limit()
@@ -264,6 +284,35 @@ unsigned int lx16a::read_temp_limit()
     // throw temp read failed warning
 
     return 256;
+}
+
+std::string lx16a::read_faults()
+{
+    int buffsize = 7;
+    uint8_t rcev_buf [buffsize];
+
+    port_ptr->port.flushInput();
+    servo_write_cmd(servo_id, ERROR_READ);
+
+    size_t b_read = port_ptr->port.read(rcev_buf, buffsize);
+
+    int fault_ind;
+
+    if (b_read == 7 && rcev_buf[0] == 0x55 &&
+        rcev_buf[1] == 0x55 && rcev_buf[4] == 0x24)
+    {
+        fault_ind = rcev_buf[5];
+    }
+
+    if (fault_ind>7 || fault_ind<0)
+    {
+        fault_ind = 8;
+        std::cout<<"Bad Index"<<std::endl;
+    }
+
+    // throw fault read failed warning
+
+    return led_err.at(fault_ind);
 }
 
 bool lx16a::check_id (unsigned int new_id)

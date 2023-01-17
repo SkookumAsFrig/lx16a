@@ -28,21 +28,30 @@ int main()
     std::cout<<servo1.check_temp()<<std::endl;
     std::cout<<servo3.check_temp()<<std::endl;
 
-    servo1.set_vin_limit(6503, 11060);
-    servo3.set_vin_limit(5920, 11590);
+    // for (int i=0; i<5; i++)
+    // {
+    // servo1.set_vin_limit(6503+i, 11060+i);
+    // servo3.set_vin_limit(5920+i, 11590+i);
+    // }
 
     unsigned int low_lim1, high_lim1, low_lim3, high_lim3;
 
+    for (int i=0; i<5; i++)
+    {
     std::tie(low_lim1, high_lim1) = servo1.read_vin_limit();
     std::tie(low_lim3, high_lim3) = servo3.read_vin_limit();
 
     printf("servo 1 low limit is %d, high limit is %d\n", low_lim1, high_lim1);
     printf("servo 3 low limit is %d, high limit is %d\n", low_lim3, high_lim3);
 
-    servo1.set_temp_limit(82);
-    servo3.set_temp_limit(75);
+    // servo1.set_temp_limit(82);
+    // servo3.set_temp_limit(75);
 
     std::cout<<servo1.read_temp_limit()<<std::endl;
     std::cout<<servo3.read_temp_limit()<<std::endl;
+    }
+
+    std::cout<<servo1.read_faults()<<std::endl;
+    std::cout<<servo3.read_faults()<<std::endl;
 
 }

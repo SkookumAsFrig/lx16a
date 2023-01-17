@@ -1,6 +1,7 @@
 #include <iostream>
 #include <algorithm>
 #include <tuple>
+#include <array>
 #include "serial/serial.h"
 
 // See docs/lx16a_protocol.pdf for servo command reference
@@ -16,11 +17,24 @@ static const uint8_t VIN_LIMIT_WRITE = 22;
 static const uint8_t VIN_LIMIT_READ = 23;
 static const uint8_t TEMP_MAX_LIMIT_WRITE = 24;
 static const uint8_t TEMP_MAX_LIMIT_READ = 25;
+static const uint8_t ERROR_READ = 36;
 // End of servo command constants
 
 // Helper function from serial library example to list available serial ports
 // Prints all serial ports to commandline
 void enumerate_ports ();
+
+// Decoding dictionary of servo LED faults for read_faults()
+static const std::array<std::string, 9> led_err =
+    {"No Alarm",
+    "Over Temperature",
+    "Over Voltage",
+    "Over Temp and Voltage",
+    "Locked Rotor",
+    "Over Temp and Stalled",
+    "Over Voltage and Stalled",
+    "Over Temp, Voltage and Stalled",
+    "Read Fault Failed"};
 
 // Serial port struct to group together port object and associated data
 struct ser_port
@@ -74,16 +88,20 @@ class lx16a
         \param struct_ptr: pointer to serial port struct for communications
         \param int id: servo hardware id
         \param int nickname: servo user defined id
+        \param bool new_safe_lim: set safety limits for new hardware (writes in persistent memory, should be set
+        to false for old servos). Vin range: 5-9.5V, max temp: 80C.
         */
-        lx16a (ser_port* struct_ptr, unsigned int id = 256, unsigned int nickname = 256);
+        lx16a (ser_port* struct_ptr, unsigned int id = 256, unsigned int nickname = 256, bool new_safe_lim = false);
 
         // copy and modify constructor for generating servos on chain
         /*!
         \param servo: base lx16a object to copy from
         \param id: new int id for copied servo object (i.e. next one on chain)
         \param nickname: new int alias for copied servo object
+        \param bool new_safe_lim: set safety limits for new hardware (writes in persistent memory, should be set
+        to false for old servos)
         */
-        lx16a (const lx16a& servo, unsigned int id = 256, unsigned int nickname = 256);
+        lx16a (const lx16a& servo, unsigned int id = 256, unsigned int nickname = 256, bool new_safe_lim = false);
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -145,13 +163,39 @@ class lx16a
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
         // Hardware Safety Tools
+        // sets voltage input safety limits in hardware, in milliVolts. Should be used sparingly due to
+        // writing in servo persistent memory
+        /*!
+        \param low_lim: int voltage lower limit in mV, range 4500-12000
+        \param high_lim: int voltage higher limit in mV, range 4500-12000
+        high_lim should be greater than low_lim, function enforces it too.
+        */
         void set_vin_limit(unsigned int low_lim, unsigned int high_lim);
 
+        // read the voltage input safety limits from persistent memory
+        /*!
+        \return: std::tuple of low and high vin limits, use std::tie(low_lim, high_lim) to decode results
+        */
         std::tuple<unsigned int, unsigned int> read_vin_limit();
 
+        // sets max temperature limit in hardware, in degrees Celcius. Should be used sparingly due to
+        // writing in servo persistent memory
+        /*!
+        \param max_temp: int max temperature limit in degrees Celcius
+        */
         void set_temp_limit(unsigned int max_temp);
 
+        // read the max temperature limit from persistent memory
+        /*!
+        \return: int max temperature limit in degrees Celcius
+        */
         unsigned int read_temp_limit();
+
+        // read the current fault
+        /*!
+        \return: std::string specifying fault according to API
+        */
+        std::string read_faults();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
