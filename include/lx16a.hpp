@@ -5,19 +5,19 @@
 #include "serial/serial.h"
 
 // See docs/lx16a_protocol.pdf for servo command reference
-static const uint8_t MOVE_WRITE = 1;
-static const uint8_t POS_READ = 28;
-static const uint8_t SERVO_MODE_WRITE = 29;
-static const uint8_t LOAD_UNLOAD_WRITE = 31;
-static const uint8_t SERVO_MOVE_STOP = 12;
-static const uint8_t TEMP_READ = 26;
-static const uint8_t ID_READ = 14;
-static const uint8_t ID_WRITE = 13;
-static const uint8_t VIN_LIMIT_WRITE = 22;
-static const uint8_t VIN_LIMIT_READ = 23;
-static const uint8_t TEMP_MAX_LIMIT_WRITE = 24;
-static const uint8_t TEMP_MAX_LIMIT_READ = 25;
-static const uint8_t ERROR_READ = 36;
+static const uint8_t MOVE_WRITE = 1,
+POS_READ = 28,
+SERVO_MODE_WRITE = 29,
+LOAD_UNLOAD_WRITE = 31,
+SERVO_MOVE_STOP = 12,
+TEMP_READ = 26,
+ID_READ = 14,
+ID_WRITE = 13,
+VIN_LIMIT_WRITE = 22,
+VIN_LIMIT_READ = 23,
+TEMP_MAX_LIMIT_WRITE = 24,
+TEMP_MAX_LIMIT_READ = 25,
+ERROR_READ = 36;
 // End of servo command constants
 
 // Helper function from serial library example to list available serial ports
