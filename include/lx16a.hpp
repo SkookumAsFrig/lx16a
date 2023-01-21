@@ -5,7 +5,7 @@
 #include "serial/serial.h"
 
 // See docs/lx16a_protocol.pdf for servo command reference
-static const uint8_t MOVE_WRITE = 1,
+constexpr uint8_t MOVE_WRITE = 1,
 POS_READ = 28,
 SERVO_MODE_WRITE = 29,
 LOAD_UNLOAD_WRITE = 31,
@@ -78,9 +78,12 @@ class lx16a
         \param part2: unsigned short for second command parameter
         \return A size_t of the number of bytes written, should expect 10, 8 or 6
         */
-        size_t servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1, uint16_t part2);
-        size_t servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1);
-        size_t servo_write_cmd (uint8_t id, uint8_t cmd);
+        size_t 
+        servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1, uint16_t part2);
+        size_t 
+        servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1);
+        size_t 
+        servo_write_cmd (uint8_t id, uint8_t cmd);
         
     public:
         // Constructors
@@ -110,19 +113,22 @@ class lx16a
         /*!
         \return: int representing servo_id parameter of object, corresponding to the hardware servo id
         */
-        unsigned int get_id();
+        unsigned int 
+        get_id();
 
         // get alias of current lx16a object
         /*!
         \return: int representing alias parameter of object
         */
-        unsigned int get_alias();
+        unsigned int 
+        get_alias();
 
         // get serial port struct pointer of current lx16a object
         /*!
         \return: ser_port pointer representing associated ser_port struct of object
         */
-        ser_port* get_ser_struct();
+        ser_port* 
+        get_ser_struct();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -133,32 +139,38 @@ class lx16a
         \param id: new int id for servo object
         \return: bool representing if servo_id change is successful. Will fail if id does not exist on chain
         */
-        bool set_obj_id(unsigned int id);
+        bool 
+        set_obj_id(unsigned int id);
 
         // set alias of current lx16a object.
         /*!
         \param nickname: new int alias for servo object
         */
-        void set_alias(unsigned int nickname);
+        void 
+        set_alias(unsigned int nickname);
 
         // set ser_port pointer of current lx16a object.
         /*!
         \param new_struct_ptr: new ser_port struct pointer for servo object
         \return: bool representing if new serial port is open, and the current servo_id exists on chain
         */
-        bool set_ser_struct(ser_port* new_struct_ptr);
+        bool 
+        set_ser_struct(ser_port* new_struct_ptr);
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
         // Serial Port Tools
         // helper function, returns servo serial port as string
-        std::string query_port ();
+        std::string 
+        query_port ();
         
         // helper function, returns boolean if servo serial port is open
-        bool query_open ();
+        bool 
+        query_open ();
 
         // helper function, returns unsigned int of serial timeout object value field
-        unsigned int query_timeout ();
+        unsigned int 
+        query_timeout ();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -170,32 +182,37 @@ class lx16a
         \param high_lim: int voltage higher limit in mV, range 4500-12000
         high_lim should be greater than low_lim, function enforces it too.
         */
-        void set_vin_limit(unsigned int low_lim, unsigned int high_lim);
+        void 
+        set_vin_limit(unsigned int low_lim, unsigned int high_lim);
 
         // read the voltage input safety limits from persistent memory
         /*!
         \return: std::tuple of low and high vin limits, use std::tie(low_lim, high_lim) to decode results
         */
-        std::tuple<unsigned int, unsigned int> read_vin_limit();
+        std::tuple<unsigned int, unsigned int> 
+        read_vin_limit();
 
         // sets max temperature limit in hardware, in degrees Celcius. Should be used sparingly due to
         // writing in servo persistent memory
         /*!
         \param max_temp: int max temperature limit in degrees Celcius
         */
-        void set_temp_limit(unsigned int max_temp);
+        void 
+        set_temp_limit(unsigned int max_temp);
 
         // read the max temperature limit from persistent memory
         /*!
         \return: int max temperature limit in degrees Celcius
         */
-        unsigned int read_temp_limit();
+        unsigned int 
+        read_temp_limit();
 
         // read the current fault
         /*!
         \return: std::string specifying fault according to API
         */
-        std::string read_faults();
+        std::string 
+        read_faults();
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -204,24 +221,28 @@ class lx16a
         /*!
         \return: int representing celcius temperature of current servo
         */
-        unsigned int check_temp ();
+        unsigned int 
+        check_temp ();
 
         // stops and unloads servo, regardless of servo or motor mode
-        void unload ();
+        void 
+        unload ();
 
         // commands servo to move to desired position in servo mode
         /*!
         \param pos: int ranging 0 to 1000 position command corresponding to 0-240 degree
             range of motion. Function automatically limits input if out of range.
         */
-        void cmd_servo_pos (unsigned int pos);
+        void 
+        cmd_servo_pos (unsigned int pos);
 
         // commands servo in motor mode with desired power
         /*!
         \param pwr: signed int ranging -1000 to 1000 corresponding to direction and 1000
             divisions of power. Function automatically limits input if out of range.
         */
-        void motor_power (int pwr);
+        void 
+        motor_power (int pwr);
 
         // query position of servo
         /*!
@@ -229,23 +250,101 @@ class lx16a
             or above 1000 in the other direction. Out of range behaviors necessitate the 16 bit
             short data type to decode the sign correctly.
         */
-        short check_pos ();
+        short 
+        check_pos ();
 
         // Helper function to ensure assigned id exists in hardware on serial port servo chain
         /*!
         \param id: int id that needs to be verified if it exists
         \return A boolean value if the id is valid and exists in hardware
         */
-        bool check_id (unsigned int new_id);
+        bool 
+        check_id (unsigned int new_id);
 
         // Change servo hardware id
         /*!
         \param new_id: new int id that the servo hardware will be assigned
         \return A boolean value if the id is valid in hardware after assignment
         */
-        bool set_hw_id (unsigned int new_id);
+        bool 
+        set_hw_id (unsigned int new_id);
 
-        // add voltage and temp warning set functions, and disable over position
-        // add exceptions to class for warnings and errors
 };
 
+class SerialReadException : public std::exception
+{
+    // Code referenced from tune2fs/OverShifted stackedoverflow
+    public:
+        /** Constructor (C strings).
+         *  @param message C-style string error message.
+         *                 The string contents are copied upon construction.
+         *                 Hence, responsibility for deleting the char* lies
+         *                 with the caller. 
+         */
+        explicit SerialReadException(const char* message)
+            : msg_(message) {}
+
+        /** Constructor (C++ STL strings).
+         *  @param message The error message.
+         */
+        explicit SerialReadException(const std::string& message)
+            : msg_(message) {}
+
+        /** Destructor.
+         * Virtual to allow for subclassing.
+         */
+        virtual ~SerialReadException() noexcept {}
+
+        /** Returns a pointer to the (constant) error description.
+         *  @return A pointer to a const char*. The underlying memory
+         *          is in posession of the Exception object. Callers must
+         *          not attempt to free the memory.
+         */
+        virtual const char* what() const noexcept {
+        return msg_.c_str();
+        }
+
+    protected:
+        /** Error message.
+         */
+        std::string msg_;
+};
+
+class HardwareException : public std::exception
+{
+    // Code referenced from tune2fs/OverShifted stackedoverflow
+    public:
+        /** Constructor (C strings).
+         *  @param message C-style string error message.
+         *                 The string contents are copied upon construction.
+         *                 Hence, responsibility for deleting the char* lies
+         *                 with the caller. 
+         */
+        explicit HardwareException(const char* message)
+            : msg_(message) {}
+
+        /** Constructor (C++ STL strings).
+         *  @param message The error message.
+         */
+        explicit HardwareException(const std::string& message)
+            : msg_(message) {}
+
+        /** Destructor.
+         * Virtual to allow for subclassing.
+         */
+        virtual ~HardwareException() noexcept {}
+
+        /** Returns a pointer to the (constant) error description.
+         *  @return A pointer to a const char*. The underlying memory
+         *          is in posession of the Exception object. Callers must
+         *          not attempt to free the memory.
+         */
+        virtual const char* what() const noexcept {
+        return msg_.c_str();
+        }
+
+    protected:
+        /** Error message.
+         */
+        std::string msg_;
+};
