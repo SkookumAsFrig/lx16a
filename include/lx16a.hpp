@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <tuple>
 #include <array>
+#include <chrono>
 #include "serial/serial.h"
 
 // See docs/lx16a_protocol.pdf for servo command reference
@@ -217,6 +218,37 @@ class lx16a
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
         // Utility Functions
+        // timing utility functions
+        // usage: float f_time, unsigned int temp, lx16a servo1;
+        // std::tie(f_time, temp) = servo1.check_time(&lx16a::check_temp);
+        /*!
+        \return: tuple of float (time in milliseconds of function run time),
+        and ret_t (original return data of function).
+        */
+        template <class ret_t>
+        std::tuple<float, ret_t>
+        check_time (ret_t (lx16a::*Func) ());
+
+        // usage: float f_time2, lx16a servo1;
+        // f_time2 = servo1.check_time(&lx16a::motor_power, 500);
+        /*!
+        \param data_in: original input parameter of function
+        \return: float (time in milliseconds of function run time)
+        */
+        template <class inp_t>
+        float
+        check_time (void (lx16a::*Func) (inp_t), inp_t data_in);
+
+        // usage: float f_time, unsigned int ret_pos, lx16a servo1;
+        // std::tie(f_time, ret_pos) = servo1.check_time(&lx16a::motor_power, &lx16a::check_pos, 500);
+        /*!
+        \param data_in: original input parameter of function Func2
+        \return: float (time in milliseconds of function run time)
+        */
+        template <class inp_t, class ret_t>
+        std::tuple<float, ret_t>
+        check_time (void (lx16a::*Func1) (inp_t), ret_t (lx16a::*Func2) (), inp_t data_in);
+        
         // query temperature of servo
         /*!
         \return: int representing celcius temperature of current servo
@@ -234,7 +266,7 @@ class lx16a
             range of motion. Function automatically limits input if out of range.
         */
         void 
-        cmd_servo_pos (unsigned int pos);
+        cmd_servo_pos (int pos);
 
         // commands servo in motor mode with desired power
         /*!
@@ -270,6 +302,40 @@ class lx16a
         set_hw_id (unsigned int new_id);
 
 };
+
+template <class ret_t>
+std::tuple<float, ret_t>
+lx16a::check_time (ret_t (lx16a::*Func) ())
+{
+    auto begin = std::chrono::high_resolution_clock::now();
+    ret_t return_v = (this->*(Func)) ();
+    auto end = std::chrono::high_resolution_clock::now();
+
+    return std::make_tuple(std::chrono::duration<float, std::milli>(end - begin).count(), return_v);
+}
+
+template <class inp_t>
+float
+lx16a::check_time (void (lx16a::*Func) (inp_t), inp_t data_in)
+{
+    auto begin = std::chrono::high_resolution_clock::now();
+    (this->*(Func)) (data_in);
+    auto end = std::chrono::high_resolution_clock::now();
+
+    return std::chrono::duration<float, std::milli>(end - begin).count();
+}
+
+template <class inp_t, class ret_t>
+std::tuple<float, ret_t>
+lx16a::check_time (void (lx16a::*Func1) (inp_t), ret_t (lx16a::*Func2) (), inp_t data_in)
+{
+    auto begin = std::chrono::high_resolution_clock::now();
+    (this->*(Func1)) (data_in);
+    ret_t return_v = (this->*(Func2)) ();
+    auto end = std::chrono::high_resolution_clock::now();
+
+    return std::make_tuple(std::chrono::duration<float, std::milli>(end - begin).count(), return_v);
+}
 
 class SerialReadException : public std::exception
 {

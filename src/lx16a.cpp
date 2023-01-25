@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <unistd.h>
 #include <tuple>
+#include <chrono>
 #include "serial/serial.h"
 #include "lx16a.hpp"
 
@@ -476,14 +477,13 @@ lx16a::unload ()
 }
 
 void 
-lx16a::cmd_servo_pos (unsigned int pos)
+lx16a::cmd_servo_pos (int pos)
 {
 
     port_ptr->port.flushInput();
     servo_write_cmd(servo_id, SERVO_MODE_WRITE, 0);
 
-    unsigned int pos_max = 1000;
-    pos = std::min(pos, pos_max);
+    pos = std::max(std::min(pos, 1000), 0);
 
     servo_write_cmd(servo_id, MOVE_WRITE, pos, 0);
     // Need to set last param move time to 0 to tell servo

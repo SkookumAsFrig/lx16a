@@ -218,7 +218,7 @@ int main()
     uint8_t rcev_buf [buffsize];
 
 
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    auto begin = std::chrono::high_resolution_clock::now();
 
     // for(int i=0; i<500; i++){
 
@@ -228,7 +228,7 @@ int main()
         // testtest.servo_write_cmd(1, POS_READ);
         testtest.servo_write_cmd(3, ERROR_READ);
 
-        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
 
         std::cout <<testtest.port_st->port.read(rcev_buf, buffsize)<< std::endl;
 
@@ -239,10 +239,15 @@ int main()
         }
         // }
 
-    std::chrono::steady_clock::time_point end2 = std::chrono::steady_clock::now();
+    auto end2 = std::chrono::high_resolution_clock::now();
 
     std::cout << "Send Time = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
     std::cout << "Recv Time = " << std::chrono::duration_cast<std::chrono::microseconds>(end2 - end).count() << "[µs]" << std::endl;
+
+    float time_f = std::chrono::duration<float, std::milli>(end2 - end).count();
+
+    printf("time in float is %.5fms \n", time_f);
+    
 
     for(int i=0; i<9; i++){
         std::cout <<led_err.at(i)<< std::endl;

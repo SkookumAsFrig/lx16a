@@ -54,4 +54,34 @@ int main()
     std::cout<<servo1.read_faults()<<std::endl;
     std::cout<<servo3.read_faults()<<std::endl;
 
+    float f_time, f_time2;
+    unsigned int temp;
+    unsigned int ret_pos;
+
+    std::tie(f_time, temp) = servo1.check_time(&lx16a::check_temp);
+
+    f_time2 = servo1.check_time(&lx16a::motor_power, 300);
+
+    usleep(500000);
+
+    auto begin = std::chrono::high_resolution_clock::now();
+    servo1.check_temp();
+    auto end = std::chrono::high_resolution_clock::now();
+
+    float manual_time = std::chrono::duration<float, std::milli>(end - begin).count();
+
+    std::cout<<f_time<<", "<<temp<<std::endl;
+
+    std::cout<<"f_time2: "<<f_time2<<std::endl;
+
+    std::tie(f_time, ret_pos) = servo1.check_time(&lx16a::motor_power, &lx16a::check_pos, 500);
+
+    std::cout<<"manual time: "<<manual_time<<std::endl;
+
+    std::cout<<"motor power and check pos time: "<<f_time<<std::endl;
+
+    usleep(500000);
+
+    servo1.motor_power(0);
+
 }
