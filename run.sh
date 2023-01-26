@@ -1,3 +1,3 @@
 #! /bin/sh
 
-cd build; ./lx16a
+./build/tests/hhm/hhm

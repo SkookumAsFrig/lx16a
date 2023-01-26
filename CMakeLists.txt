@@ -5,7 +5,7 @@ project(lx16a VERSION 0.1)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_executable(${PROJECT_NAME} tests/hhm_test.cpp)
+# add_executable(${PROJECT_NAME} tests/hhm_test.cpp)
 
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
@@ -33,7 +33,10 @@ list(APPEND EXTRA_LIBS serial lx16a_lib)
 
 add_subdirectory(${PROJECT_SOURCE_DIR}/ext/serial)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests/hhm)
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests/poc)
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests/test)
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${EXTRA_INCLUDES})
+# target_include_directories(${PROJECT_NAME} PUBLIC ${EXTRA_INCLUDES})
 
-target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})
+# target_link_libraries(${PROJECT_NAME} ${EXTRA_LIBS})

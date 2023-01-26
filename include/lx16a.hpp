@@ -218,10 +218,13 @@ class lx16a
         ///////////////////////////////////////////////////////////////////////////////////////////////
 
         // Utility Functions
-        // timing utility functions
+
+        // 3 overloaded timing utility functions
+        // designed for use with check_temp(), unload(), cmd_servo_pos(), motor_power(), check_pos()
         // usage: float f_time, unsigned int temp, lx16a servo1;
         // std::tie(f_time, temp) = servo1.check_time(&lx16a::check_temp);
         /*!
+        \param Func: lx16a member function pointer with return type ret_t, and no input parameter
         \return: tuple of float (time in milliseconds of function run time),
         and ret_t (original return data of function).
         */
@@ -232,6 +235,7 @@ class lx16a
         // usage: float f_time2, lx16a servo1;
         // f_time2 = servo1.check_time(&lx16a::motor_power, 500);
         /*!
+        \param Func: lx16a member function pointer with no return value, and single input parameter
         \param data_in: original input parameter of function
         \return: float (time in milliseconds of function run time)
         */
@@ -242,8 +246,11 @@ class lx16a
         // usage: float f_time, unsigned int ret_pos, lx16a servo1;
         // std::tie(f_time, ret_pos) = servo1.check_time(&lx16a::motor_power, &lx16a::check_pos, 500);
         /*!
-        \param data_in: original input parameter of function Func2
-        \return: float (time in milliseconds of function run time)
+        \param Func1: lx16a member function pointer with no return value, and single input parameter
+        \param Func2: lx16a member function pointer with return type ret_t, and no input parameter
+        \param data_in: original input parameter of function Func1
+        \return: tuple of float (time in milliseconds of function run time),
+        and ret_t (original return data of Func2).
         */
         template <class inp_t, class ret_t>
         std::tuple<float, ret_t>
