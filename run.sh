@@ -1,3 +1,3 @@
 #! /bin/sh
 
-./build/tests/hhm/hhm
+./build/tests/unit/unit

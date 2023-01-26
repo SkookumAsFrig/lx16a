@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(lx16a VERSION 0.1)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # add_executable(${PROJECT_NAME} tests/hhm_test.cpp)
@@ -35,7 +35,8 @@ add_subdirectory(${PROJECT_SOURCE_DIR}/ext/serial)
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests/hhm)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests/poc)
-add_subdirectory(${PROJECT_SOURCE_DIR}/tests/test)
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests/basic_test)
+add_subdirectory(${PROJECT_SOURCE_DIR}/tests/unit)
 
 # target_include_directories(${PROJECT_NAME} PUBLIC ${EXTRA_INCLUDES})
 

@@ -1,4 +1,4 @@
-add_executable(first_test test.cpp)
+add_executable(first_test basic_test.cpp)
 
 list(APPEND EXTRA_INCLUDES ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/ext/serial/include ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include)
 list(APPEND EXTRA_LIBS serial lx16a_lib)
