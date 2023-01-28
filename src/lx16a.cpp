@@ -41,13 +41,14 @@ ser_port::ser_port (const std::string &portname, unsigned int baud, unsigned int
     catch (const HardwareException e)
     {
         std::cerr << e.what() << '\n';
+        // Handle timeout too short as nonfatal warning
     }
     catch (const serial::IOException se)
     {
         std::cerr << se.what() << '\n';
-        std::cerr << "Serial port failed to open. Check that it exists with enumerate_ports()." << '\n';
-        std::cerr << "Terminating program." << '\n';
-        std::terminate();
+        std::cerr << "Serial port failed to open. Check that it exists with enumerate_ports().\n";
+        // Handle serial port problem as fatal error
+        throw;
     }
 
 }
@@ -76,6 +77,7 @@ lx16a::lx16a (ser_port* struct_ptr, unsigned int id, unsigned int nickname, bool
     catch (const HardwareException e)
     {
         std::cerr << e.what() << '\n';
+        throw;
     }
 }
 
@@ -103,6 +105,7 @@ lx16a::lx16a (const lx16a& servo, unsigned int id, unsigned int nickname, bool n
     catch (const HardwareException e)
     {
         std::cerr << e.what() << '\n';
+        throw;
     }
 
 }
