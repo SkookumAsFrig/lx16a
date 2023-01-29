@@ -15,4 +15,3 @@ target_link_libraries(unit ${EXTRA_LIBS})
 
 include(GoogleTest)
 gtest_discover_tests(unit)
-# -Dgtest_disable_pthreads=OFF

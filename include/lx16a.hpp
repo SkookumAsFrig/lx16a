@@ -94,6 +94,7 @@ class lx16a
         \param int nickname: servo user defined id
         \param bool new_safe_lim: set safety limits for new hardware (writes in persistent memory, should be set
         to false for old servos). Vin range: 5-9.5V, max temp: 80C.
+        \throws HardwareException
         */
         lx16a (ser_port* struct_ptr, unsigned int id = 256, unsigned int nickname = 256, bool new_safe_lim = false);
 
@@ -104,6 +105,7 @@ class lx16a
         \param nickname: new int alias for copied servo object
         \param bool new_safe_lim: set safety limits for new hardware (writes in persistent memory, should be set
         to false for old servos)
+        \throws HardwareException
         */
         lx16a (const lx16a& servo, unsigned int id = 256, unsigned int nickname = 256, bool new_safe_lim = false);
 
@@ -139,6 +141,7 @@ class lx16a
         /*!
         \param id: new int id for servo object
         \return: bool representing if servo_id change is successful. Will fail if id does not exist on chain
+        \throws SerialRWException if cmd write fails and HardwareException if port is closed
         */
         bool 
         set_obj_id(unsigned int id);
@@ -154,6 +157,8 @@ class lx16a
         /*!
         \param new_struct_ptr: new ser_port struct pointer for servo object
         \return: bool representing if new serial port is open, and the current servo_id exists on chain
+        \throws serial::IOException if new port does not exist, SerialRWException if cmd write fails,
+         and HardwareException if port is closed
         */
         bool 
         set_ser_struct(ser_port* new_struct_ptr);
@@ -162,6 +167,7 @@ class lx16a
 
         // Serial Port Tools
         // helper function, returns servo serial port as string
+        // passthru of serial::Serial class functions
         std::string 
         query_port ();
         
@@ -344,7 +350,7 @@ lx16a::check_time (void (lx16a::*Func1) (inp_t), ret_t (lx16a::*Func2) (), inp_t
     return std::make_tuple(std::chrono::duration<float, std::milli>(end - begin).count(), return_v);
 }
 
-class SerialReadException : public std::exception
+class SerialRWException : public std::exception
 {
     // Code referenced from tune2fs/OverShifted stackedoverflow
     public:
@@ -354,19 +360,19 @@ class SerialReadException : public std::exception
          *                 Hence, responsibility for deleting the char* lies
          *                 with the caller. 
          */
-        explicit SerialReadException(const char* message)
+        explicit SerialRWException(const char* message)
             : msg_(message) {}
 
         /** Constructor (C++ STL strings).
          *  @param message The error message.
          */
-        explicit SerialReadException(const std::string& message)
+        explicit SerialRWException(const std::string& message)
             : msg_(message) {}
 
         /** Destructor.
          * Virtual to allow for subclassing.
          */
-        virtual ~SerialReadException() noexcept {}
+        virtual ~SerialRWException() noexcept {}
 
         /** Returns a pointer to the (constant) error description.
          *  @return A pointer to a const char*. The underlying memory

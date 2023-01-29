@@ -137,14 +137,28 @@ lx16a::servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1, uint16_t part2)
             }
 
             buf[9] = ~chksm;
+
+            size_t written = port_ptr->port.write(buf, 10);
+
+            if (written != 10)
+            {
+                throw SerialRWException("servo_write_cmd did not write all 10 bytes.");
+            }
             
-            return port_ptr->port.write(buf, 10);
+            return written;
         }
         else throw HardwareException("Serial port closed.");
     }
     catch (const HardwareException e)
     {
         std::cerr << e.what() << '\n';
+        throw;
+        // Treat closed serial port as fatal error
+    }
+    catch (const SerialRWException e)
+    {
+        std::cerr << e.what() << '\n';
+        // Treat partial serial write as nonfatal warning
     }
 
     return 0;
@@ -175,11 +189,23 @@ lx16a::servo_write_cmd (uint8_t id, uint8_t cmd, uint16_t part1)
 
             buf[7] = ~chksm;
             
-            return port_ptr->port.write(buf, 8);
+            size_t written = port_ptr->port.write(buf, 8);
+
+            if (written != 8)
+            {
+                throw SerialRWException("servo_write_cmd did not write all 8 bytes.");
+            }
+            
+            return written;
         }
         else throw HardwareException("Serial port closed.");
     }
     catch (const HardwareException e)
+    {
+        std::cerr << e.what() << '\n';
+        throw;
+    }
+    catch (const SerialRWException e)
     {
         std::cerr << e.what() << '\n';
     }
@@ -209,11 +235,23 @@ lx16a::servo_write_cmd (uint8_t id, uint8_t cmd)
 
             buf[5] = ~chksm;
             
-            return port_ptr->port.write(buf, 6);
+            size_t written = port_ptr->port.write(buf, 6);
+
+            if (written != 6)
+            {
+                throw SerialRWException("servo_write_cmd did not write all 6 bytes.");
+            }
+            
+            return written;
         }
         else throw HardwareException("Serial port closed.");
     }
     catch (const HardwareException e)
+    {
+        std::cerr << e.what() << '\n';
+        throw;
+    }
+    catch (const SerialRWException e)
     {
         std::cerr << e.what() << '\n';
     }
@@ -282,7 +320,7 @@ lx16a::query_open ()
 unsigned int 
 lx16a::query_timeout ()
 {
-    return port_ptr->port.getTimeout().inter_byte_timeout;
+    return port_ptr->port.getTimeout().read_timeout_constant;
 }
 
 void 
@@ -329,9 +367,9 @@ lx16a::read_vin_limit()
             low_lim = rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8));
             high_lim = rcev_buf[7] | (0xFF00 & (rcev_buf[8] << 8));
         }
-        else throw SerialReadException("Voltage limits read failed.");
+        else throw SerialRWException("Voltage limits read failed.");
     }
-    catch (const SerialReadException e)
+    catch (const SerialRWException e)
     {
         std::cerr << e.what() << '\n';
     }
@@ -368,10 +406,10 @@ lx16a::read_temp_limit()
         {
             return rcev_buf[5];
         }
-        else throw SerialReadException("Temperature max limit read failed.");
+        else throw SerialRWException("Temperature max limit read failed.");
 
     }
-    catch (const SerialReadException e)
+    catch (const SerialRWException e)
     {
         std::cerr << e.what() << '\n';
     }
@@ -400,14 +438,14 @@ lx16a::read_faults()
         {
             fault_ind = rcev_buf[5];
         }
-        else throw SerialReadException("Fault read failed.");
+        else throw SerialRWException("Fault read failed.");
 
         if (fault_ind>7 || fault_ind<0)
         {
-            throw SerialReadException("Fault read index out of range."); 
+            throw SerialRWException("Fault read index out of range."); 
         }
     }
-    catch (const SerialReadException e)
+    catch (const SerialRWException e)
     {
         std::cerr << e.what() << '\n';
         fault_ind = 8;
@@ -458,9 +496,9 @@ lx16a::check_temp ()
         {
             return rcev_buf[5];
         }
-        else throw SerialReadException("Temperature Read Failed.");
+        else throw SerialRWException("Temperature Read Failed.");
     }
-    catch (const SerialReadException e)
+    catch (const SerialRWException e)
     {
         std::cerr << e.what() << '\n';
     }
@@ -524,9 +562,9 @@ lx16a::check_pos ()
         {
             return rcev_buf[5] | (0xFF00 & (rcev_buf[6] << 8));
         }
-        else throw SerialReadException("Position Read Failed.");
+        else throw SerialRWException("Position Read Failed.");
     }
-    catch (const SerialReadException e)
+    catch (const SerialRWException e)
     {
         std::cerr << e.what() << '\n';
     }

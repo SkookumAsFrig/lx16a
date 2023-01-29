@@ -48,6 +48,12 @@ TEST(ConstructorTest, SerPortStructWrongPort) {
 TEST(ConstructorTest, SerPortStructRightPort) {
   // with serial device on ttyUSB0
   EXPECT_NO_THROW(ser_port port_struct("/dev/ttyUSB0", 115200, 50, 1));
+  ser_port port_struct("/dev/ttyUSB0", 115200, 50, 1);
+  EXPECT_EQ(port_struct.group_id, 1);
+  EXPECT_EQ(port_struct.port.getBaudrate(), 115200);
+  EXPECT_EQ(port_struct.port.getPort(), "/dev/ttyUSB0");
+  EXPECT_EQ(port_struct.port.getTimeout().read_timeout_constant, 50);
+  EXPECT_EQ(port_struct.port.getTimeout().write_timeout_constant, 50);
 }
 
 TEST(ConstructorTest, SerPortStructWrongTimeout) {
@@ -82,7 +88,7 @@ namespace {
   TEST_F(lx16aConstructorTests, ServoConstWorks) {
     EXPECT_NO_THROW(lx16a servo1(port_struct_ptr, 1, 1));
 
-    lx16a servo1(port_struct_ptr, 1, 1);
+    lx16a servo1(port_struct_ptr, 1, 5);
     unsigned int low_lim1, high_lim1, temp_max;
     std::tie(low_lim1, high_lim1) = servo1.read_vin_limit();
     temp_max = servo1.read_temp_limit();
@@ -91,6 +97,7 @@ namespace {
     EXPECT_EQ(high_lim1, 9500);
     EXPECT_EQ(temp_max, 80);
     EXPECT_EQ(servo1.get_id(), 1);
+    EXPECT_EQ(servo1.get_alias(), 5);
   }
 
   TEST_F(lx16aConstructorTests, ServoConstFailsIDRange) {
@@ -125,7 +132,7 @@ namespace {
     lx16a servo1(port_struct_ptr, 1, 1);
     EXPECT_NO_THROW(lx16a servo3(servo1, 3, 3));
 
-    lx16a servo3(servo1, 3, 3);
+    lx16a servo3(servo1, 3, 6);
     unsigned int low_lim1, high_lim1, temp_max;
     std::tie(low_lim1, high_lim1) = servo3.read_vin_limit();
     temp_max = servo3.read_temp_limit();
@@ -134,6 +141,7 @@ namespace {
     EXPECT_EQ(high_lim1, 9500);
     EXPECT_EQ(temp_max, 80);
     EXPECT_EQ(servo3.get_id(), 3);
+    EXPECT_EQ(servo3.get_alias(), 6);
   }
 
   TEST_F(lx16aConstructorTests, ServoCopyFailsIDRange) {
@@ -179,6 +187,8 @@ namespace {
 
       void TearDown() {
         port_struct_ptr->port.close();
+        delete servo1;
+        delete servo3;
         delete port_struct_ptr;
       }
 
@@ -186,9 +196,10 @@ namespace {
       lx16a* servo1;
       lx16a* servo3;
   };
+
+  // TEST_F(lx16aFunctionTests, ServoCopyFailsIDBus) {
+
 }
-
-
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

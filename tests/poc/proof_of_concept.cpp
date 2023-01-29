@@ -110,7 +110,7 @@ class lx16a_chain
         }
 
         unsigned int query_timeout(){
-            return port_st->port.getTimeout().inter_byte_timeout;
+            return port_st->port.getTimeout().read_timeout_constant;
         }
         // void setmode();
         // void 
@@ -164,7 +164,7 @@ int main()
     port_struct.port.setPort("/dev/ttyUSB0");
     port_struct.port.setBaudrate(115200);
     serial::Timeout chain_time= serial::Timeout::simpleTimeout(10);
-    std::cout<<chain_time.inter_byte_timeout<<std::endl;
+    std::cout<<chain_time.read_timeout_constant<<std::endl;
     port_struct.port.setTimeout(chain_time);
     port_struct.port.open();
 
