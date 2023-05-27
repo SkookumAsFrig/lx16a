@@ -23,6 +23,9 @@ $ wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
 $ sudo apt-get update
 $ sudo apt-get install python3-catkin-tools
 
+$ # Or for 20.04 and up:
+$ pip3 install -U catkin_tools
+
 $ sudo apt-get install cmake python-catkin-pkg python-empy python-nose libgtest-dev
 $ sudo apt-get install ros-melodic-catkin
 
