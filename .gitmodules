@@ -1,6 +1,6 @@
-[submodule "ext/serial"]
-	path = ext/serial
-	url = git@github.com:wjwwood/serial.git
 [submodule "ext/googletest"]
 	path = ext/googletest
 	url = git@github.com:google/googletest.git
+[submodule "ext/myserial"]
+	path = ext/myserial
+	url = git@github.com:SkookumAsFrig/serial.git

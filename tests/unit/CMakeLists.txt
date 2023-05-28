@@ -3,7 +3,7 @@ add_executable(unit unit_test.cpp)
 enable_testing()
 
 list(APPEND EXTRA_INCLUDES ${PROJECT_SOURCE_DIR} 
-${PROJECT_SOURCE_DIR}/ext/serial/include 
+${PROJECT_SOURCE_DIR}/ext/myserial/include 
 ${PROJECT_SOURCE_DIR}/ext/googletest/googletest/include
 ${PROJECT_SOURCE_DIR}/src 
 ${PROJECT_SOURCE_DIR}/include)
