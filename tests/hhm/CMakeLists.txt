@@ -1,8 +1,15 @@
-add_executable(hhm hhm_test.cpp)
+set(EXEC_NAME hhm_test)
 
-list(APPEND EXTRA_INCLUDES ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/ext/myserial/include ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include)
+# message(STATUS "exec name of first_test is ${EXEC_NAME}, cmake src dir is ${CMAKE_SOURCE_DIR}")
+
+add_executable(${EXEC_NAME} hhm_test.cpp)
+
+# debug message
+# message(STATUS "I am here: project name ${PROJECT_NAME}, project source dir ${PROJECT_SOURCE_DIR}")
+
+list(APPEND EXTRA_INCLUDES ${PROJECT_SOURCE_DIR} ${PROJECT_BINARY_DIR} ${PROJECT_SOURCE_DIR}/ext/myserial/include ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include)
 list(APPEND EXTRA_LIBS serial lx16a_lib)
 
-target_include_directories(hhm PUBLIC ${EXTRA_INCLUDES})
+target_include_directories(${EXEC_NAME} PUBLIC ${EXTRA_INCLUDES})
 
-target_link_libraries(hhm ${EXTRA_LIBS})
+target_link_libraries(${EXEC_NAME} ${EXTRA_LIBS})
