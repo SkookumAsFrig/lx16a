@@ -7,6 +7,7 @@ Pull with: git clone --recurse-submodules
 Also https://github.com/google/googletest for unit/integration testing, specifically v1.12.1
 
 ```
+$ cd lx16a/ext/googletest
 $ git checkout release-1.12.1
 ```
 
@@ -19,21 +20,6 @@ linux command line shortcuts (shell scripts must be executable (chmod +x configu
 Install prereqs on new Ubuntu machine: 
 
 ```
-$ sudo sh \
-    -c 'echo "deb http://packages.ros.org/ros/ubuntu `lsb_release -sc` main" \
-        > /etc/apt/sources.list.d/ros-latest.list'
-$ wget http://packages.ros.org/ros.key -O - | sudo apt-key add -
-
-$ sudo apt-get update
-$ sudo apt-get install python3-catkin-tools
-
-$ # Or for 20.04 and up:
-$ pip3 install -U catkin_tools
-
-$ sudo apt-get install cmake python-catkin-pkg python-empy python-nose libgtest-dev
-$ sudo apt-get install ros-melodic-catkin
-
-$ source /opt/ros/melodic/setup.bash
+# my fork of serial no longer needs python packages and catkin, which were depreciated for Ubuntu 20.04 Jammy
+sudo apt install libboost-all-dev cmake
 ```
-
-Add sourcing catkin to bashrc for automatic upon new terminal session, change melodic to ROS version of choice
