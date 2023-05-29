@@ -31,14 +31,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 #     message(FATAL_ERROR "The submodules were not downloaded! GIT_SUBMODULE was turned off or failed. Please update submodules and try again.")
 # endif()
 
-# list(APPEND EXTRA_INCLUDES ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/ext/myserial/include ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include)
-# list(APPEND EXTRA_LIBS serial lx16a_lib)
-
 add_subdirectory(${PROJECT_SOURCE_DIR}/src)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests/hhm)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests/poc)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests/basic_test)
 add_subdirectory(${PROJECT_SOURCE_DIR}/tests/unit)
+
+add_subdirectory(${PROJECT_SOURCE_DIR}/ext/googletest)
+add_subdirectory(${PROJECT_SOURCE_DIR}/ext/myserial)
+
+# list(APPEND EXTRA_INCLUDES ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/ext/myserial/include ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include)
+# list(APPEND EXTRA_LIBS serial lx16a_lib)
 
 # target_include_directories(${PROJECT_NAME} PUBLIC ${EXTRA_INCLUDES})
 
